@@ -15,7 +15,3 @@ spec:
     protocol:  TCP
     port: 9000
     targetPort: pod-nxtcld-port
-  - name: nginx-port
-    protocol: TCP
-    port: 8080
-    targetPort: pod-nginx-port

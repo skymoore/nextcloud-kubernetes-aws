@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: nextcloud
-  name: nextcloud-redis
+  name: redis-service
   labels:
     app: redis-service
 spec:
@@ -13,5 +13,5 @@ spec:
   ports:
   - name: redis-port
     protocol:  TCP
-    port: 6370
+    port: 6379
     targetPort: pod-redis-port

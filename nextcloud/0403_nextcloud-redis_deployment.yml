@@ -1,0 +1,34 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: nextcloud
+  name: nextcloud-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "nextcloud-redis"
+  template:
+    metadata:
+      labels:
+        app: nextcloud-redis
+    spec:
+      hostname: nextcloud-redis
+      volumes:
+        - name: redis-ebs
+          persistentVolumeClaim:
+            claimName: nextcloud-redis-claim
+      containers:
+        - name: nextcloud-redis
+          image: redis:7-alpine
+          env:
+            - name: ALLOW_EMPTY_PASSWORD
+              value: "yes"
+          ports:
+            - name: pod-redis-port
+              containerPort: 6379
+              protocol: TCP
+          volumeMounts:
+            - name: redis-ebs
+              mountPath: /data

@@ -1,0 +1,66 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: nextcloud
+  name: nextcloud-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nextcloud-db
+  template:
+    metadata:
+      labels:
+        app: nextcloud-db
+    spec:
+      hostname: nextcloud-db
+      volumes:
+        - name: database-ebs
+          persistentVolumeClaim:
+            claimName: nextcloud-db-claim
+      initContainers:
+        - name: volume-dirs-init-cntr
+          image: busybox:1.35
+          command:
+            - "/bin/mkdir"
+          args:
+            - "-p"
+            - "/db/data"
+          volumeMounts:
+            - name: database-ebs
+              mountPath: "/db"
+      containers:
+        - name: nextcloud-db
+          image: postgres:13-alpine
+          env:
+            - name: PG_TRUST_LOCALNET
+              value: "true"
+            - name: POSTGRES_HOST_AUTH_METHOD
+              value: trust
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-secrets
+                  key: db-user
+                  optional: false
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-secrets
+                  key: db-pass
+                  optional: false
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: nextcloud-secrets
+                  key: db-name
+                  optional: false
+          ports:
+            - name: pod-db-port
+              containerPort: 5432
+              protocol: TCP
+          volumeMounts:
+            - name: database-ebs
+              mountPath: /var/lib/postgresql/data
+              subPath: data

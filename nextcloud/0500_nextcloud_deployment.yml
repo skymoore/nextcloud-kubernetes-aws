@@ -16,7 +16,6 @@ spec:
         app: nextcloud
     spec:
       hostname: nextcloud
-      # TODO: was the ownership the issue with nextcloud:23-apache?
       securityContext:
         fsGroup: 33
         runAsUser: 33
@@ -61,9 +60,8 @@ spec:
                   key: db-pass
                   optional: false
 
-            # TODO: get redis working for sessions
-            # - name: REDIS_HOST
-            #   value: redis-service
+            - name: REDIS_HOST
+              value: redis-service
 
             - name: NEXTCLOUD_TRUSTED_DOMAINS
               value: cld.rwx.dev

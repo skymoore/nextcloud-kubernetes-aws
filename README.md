@@ -1,4 +1,4 @@
-# Nextcloud Kubernetes AWS
+# Nextcloud Kubernetes AWS Nginx
 
 ## Requirements
 - eks cluster running in aws

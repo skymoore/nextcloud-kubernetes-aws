@@ -1,0 +1,67 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: nextcloud-cron
+  namespace: nextcloud
+spec:
+  schedule: "*/5  *  *  *  *"
+  
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+          - name: nextcloud-ebs
+            persistentVolumeClaim:
+              claimName: nextcloud-data-claim
+          containers:
+            - name: php-cron
+              image: nextcloud:24-fpm
+              securityContext:
+                runAsUser: 33
+              command: ["php", "-f", "/var/www/html/cron.php"]
+              volumeMounts:
+              - name: nextcloud-ebs
+                mountPath: /var/www/html
+              resources:
+                requests:
+                  memory: 1024Mi
+              env:
+                - name: POSTGRES_HOST
+                  value: nextcloud-db
+                - name: POSTGRES_DB
+                  valueFrom:
+                    secretKeyRef:
+                      name: nextcloud-secrets
+                      key: db-name
+                      optional: false
+                - name: POSTGRES_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: nextcloud-secrets
+                      key: db-user
+                      optional: false
+                - name: POSTGRES_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: nextcloud-secrets
+                      key: db-pass
+                      optional: false
+
+                - name: REDIS_HOST
+                  value: redis-service
+
+                - name: NEXTCLOUD_TRUSTED_DOMAINS
+                  value: cld.rwx.dev
+
+                - name: PHP_UPLOAD_LIMIT
+                  value: 3072M
+
+                - name: TRUSTED_PROXIES
+                  value: cld.rwx.dev
+                - name: OVERWRITEHOST
+                  value: cld.rwx.dev
+                - name: OVERWRITEPROTOCOL
+                  value: https
+          restartPolicy: Never

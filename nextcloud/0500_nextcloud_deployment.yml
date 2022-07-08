@@ -33,7 +33,7 @@ spec:
 
       containers:
         - name: nextcloud
-          image: nextcloud:23-fpm
+          image: nextcloud:24-fpm
           imagePullPolicy: Always
           resources:
             requests:

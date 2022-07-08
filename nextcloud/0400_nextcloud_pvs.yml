@@ -20,7 +20,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: nextcloud-storage-class
+  storageClassName: nextcloud-ephemeral-storage-class
   resources:
     requests:
       storage: 5Gi
